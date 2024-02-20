@@ -1,0 +1,13 @@
+server:
+  port: 8080
+  address: localhost
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: killerbee
+
+  liquibase:
+    enabled: true
+    change-log: classpath:changelog/dbchangelog.xml
