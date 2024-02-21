@@ -46,4 +46,11 @@ public enum PostgreSqlTables {
 
     // tables for Android version control
     ANDROID_VERSION_CONTROL_TABLE, // <- хранит последнюю версию андроид приложения
+
+    LOG,
+    USER,
+    OWNER,
+    VIDEO,
+    PRODUCT,
+    COMMENT,
 }

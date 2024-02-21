@@ -3,7 +3,7 @@ package com.example.fido.constants;
 /*
 https://postgrespro.ru/docs/postgresql/9.6/functions-datetime
  */
-public final class PosgreDateFunctions {
+public final class PostgreDateFunctions {
     /*
     Вычитает аргументы и выдаёт «символический» результат с годами и месяцами, а не просто днями
      */
@@ -12,7 +12,7 @@ public final class PosgreDateFunctions {
     /*
     Текущая дата и время (на момент начала транзакции);
     */
-    public final static String NOW = "NOW()";
+    public final static String NOW = "now()";
 
     /*
     Текущая дата и время (меняется в процессе выполнения операторов);

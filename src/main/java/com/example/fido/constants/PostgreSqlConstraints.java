@@ -1,6 +1,10 @@
 package com.example.fido.constants;
 
 public enum PostgreSqlConstraints {
+    check_age,
+    check_name,
+    check_data,
+
     entities_patruls_rank_must_be_unique,
     entities_patruls_email_must_be_unique,
     entities_patruls_organName_must_be_unique,

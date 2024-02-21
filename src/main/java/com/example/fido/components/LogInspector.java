@@ -10,12 +10,19 @@ import org.apache.logging.log4j.LogManager;
 public class LogInspector extends DataValidateInspector {
     private final Logger LOGGER = LogManager.getLogger( "LOGGER_WITH_JSON_LAYOUT" );
 
-    private Logger getLOGGER() { return this.LOGGER; }
+    private Logger getLOGGER() {
+        return this.LOGGER;
+    }
 
-    protected final void logging ( final String message ) { this.getLOGGER().info( message ); }
+    protected final void logging ( final String message ) {
+        this.getLOGGER().info( message );
+    }
 
-    protected final void logging ( final Throwable error ) { this.getLOGGER().error( "Error: " + error ); }
+    protected final void logging ( final Throwable error ) {
+        this.getLOGGER().error( "Error: " + error );
+    }
 
-    protected void logging ( final Throwable error, final Object o ) { this.getLOGGER().error("Error: {} and reason: {}: ",
-            error.getMessage(), o ); }
+    protected void logging ( final Throwable error, final Object o ) {
+        this.getLOGGER().error("Error: {} and reason: {}: ", error.getMessage(), o );
+    }
 }

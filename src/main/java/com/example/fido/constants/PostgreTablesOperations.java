@@ -60,7 +60,9 @@ public final class PostgreTablesOperations {
         CHECK (price > discounted_price)
     );
      */
-    public final static String CHECK = "CHECK ( %s )";
+    public final static String CHECK = "CHECK";
+
+    public final static String CONSTRAINT = "CONSTRAINT";
 
     /*
     Ограничение NOT NULL всегда записывается как ограничение столбца и функционально эквивалентно ограничению
@@ -292,7 +294,9 @@ public final class PostgreTablesOperations {
            [ CONNECTION LIMIT [=] предел_подключений ]
            [ IS_TEMPLATE [=] это_шаблон ] ]
     */
-    public final static String CREATE_DATABASE = "CREATE DATABASE %s";
+    public final static String CREATE_DATABASE = "CREATE DATABASE IF NOT EXISTS %s";
+
+    public final static String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS";
 
     /*
     https://postgrespro.ru/docs/postgresql/9.6/functions-trigger <- DOCS
@@ -387,4 +391,6 @@ public final class PostgreTablesOperations {
     public final static String NULLS_LAST = "NULLS LAST";
 
     public final static String NULLS_FIRST = "NULLS FIRST";
+
+    public final static String DEFAULT = "DEFAULT";
 }

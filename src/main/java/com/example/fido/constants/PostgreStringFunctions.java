@@ -1,6 +1,6 @@
 package com.example.fido.constants;
 
-public final class PosgreStringFunctions {
+public final class PostgreStringFunctions {
     /*
     https://postgrespro.ru/docs/postgresql/9.6/functions-matching
 
