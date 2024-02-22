@@ -43,6 +43,7 @@ public final class RedisDataControl {
     }
 
     public void close () {
+        this.userMap.delete().onErrorComplete().subscribe();
         this.redissonReactiveClient.shutdown();
         redisDataControl = null;
     }
