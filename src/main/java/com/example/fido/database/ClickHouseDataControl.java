@@ -1,8 +1,6 @@
 package com.example.fido.database;
 
-import java.sql.*;
 import java.util.*;
-
 import com.clickhouse.client.*;
 
 import com.example.fido.components.ErrorInspector;
@@ -14,11 +12,8 @@ import com.example.fido.constants.clickhouse.Categories;
 отвечает за работу с БД ClickHouse
 */
 public final class ClickHouseDataControl extends ErrorInspector {
-    private Connection connection;
     private final ClickHouseNode server;
     private final ClickHouseClient clickHouseClient;
-
-    private static final String DB_URL = "jdbc:clickhouse://localhost:8123/default";
 
     public ClickHouseDataControl () {
         this.server = ClickHouseNode
@@ -30,6 +25,7 @@ public final class ClickHouseDataControl extends ErrorInspector {
                 .build();
 
         this.clickHouseClient = ClickHouseClient.newInstance( this.server.getProtocol() );
+        DatabaseRegisterTablesAndTypes.register( this.server, this.clickHouseClient );
     }
 
     public void insertValues () {
@@ -99,7 +95,7 @@ public final class ClickHouseDataControl extends ErrorInspector {
                     )
             );
 
-            for ( int i = 0; i < 1_000_000; i++ ) {
+            for ( int i = 0; i < 1_000; i++ ) {
                 stringBuilder.append( "(" )
                         .append( tags.get( random.nextInt( 0, tags.size() - 1 ) ) )
                         .append( ", '" )
@@ -125,7 +121,22 @@ public final class ClickHouseDataControl extends ErrorInspector {
                         .append( ")" );
             }
 
-            this.connection.createStatement().execute( stringBuilder.toString() );
+            try (
+                final ClickHouseResponse response = this.clickHouseClient.connect( this.server )
+                        .write()
+                        .table(
+                                PostgreSqlTables.TABLETS.name().toLowerCase()
+                                + "."
+                                + PostgreSqlTables.PRODUCT.name().toLowerCase()
+                        ).format( ClickHouseFormat.RowBinary )
+                        .query( stringBuilder.toString() )
+                        .executeAndWait()
+            ) {
+                final ClickHouseResponseSummary summary = response.getSummary();
+                System.out.println( summary.getWrittenRows() );
+            }
+
+//            this.connection.createStatement().execute( stringBuilder.toString() );
 
             System.out.println( "It is done" );
 
