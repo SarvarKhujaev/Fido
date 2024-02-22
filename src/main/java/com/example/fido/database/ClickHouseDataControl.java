@@ -1,30 +1,158 @@
 package com.example.fido.database;
 
 import java.sql.*;
-import java.util.Properties;
+import java.util.*;
+
+import com.clickhouse.client.*;
 
 import com.example.fido.components.ErrorInspector;
+import com.example.fido.constants.PostgreCommands;
 import com.example.fido.constants.PostgreSqlTables;
-import com.example.fido.constants.PostgreTablesOperations;
+import com.example.fido.constants.clickhouse.Categories;
 
 /*
 отвечает за работу с БД ClickHouse
 */
 public final class ClickHouseDataControl extends ErrorInspector {
     private Connection connection;
+    private final ClickHouseNode server;
+    private final ClickHouseClient clickHouseClient;
 
     private static final String DB_URL = "jdbc:clickhouse://localhost:8123/default";
 
     public ClickHouseDataControl () {
+        this.server = ClickHouseNode
+                .builder()
+                .host( "localhost" )
+                .port( ClickHouseProtocol.HTTP, 8123 )
+                .database( "default" )
+                .credentials( ClickHouseCredentials.fromUserAndPassword( "default", "killerbee1998" ) )
+                .build();
+
+        this.clickHouseClient = ClickHouseClient.newInstance( this.server.getProtocol() );
+    }
+
+    public void insertValues () {
         try {
-            final Properties properties = new Properties();
-            properties.setProperty( "user", "default" );
-            properties.setProperty( "password", "killerbee1998" );
+            final List< Categories > categories = List.of( Categories.values() );
+            final List< List< String > > tags = List.of(
+                    List.of(
+                            "'Kuplinov'",
+                            "'Dangar'",
+                            "'UFA'"
+                    ),
 
-            this.connection = DriverManager.getConnection( DB_URL, properties );
+                    List.of(
+                            "'TEST'",
+                            "'Kuplinov'",
+                            "'Dangar'"
+                    ),
 
-            DatabaseRegisterTablesAndTypes.register( connection );
-        } catch ( final SQLException e ) {
+                    List.of(
+                            "'Kuplinov'",
+                            "'UFA'"
+                    ),
+
+                    List.of(
+                            "'Dangar'",
+                            "'UFA'",
+                            "'TEST'"
+                    ),
+
+                    List.of(
+                            "'Dangar'",
+                            "'UFA'"
+                    )
+            );
+
+            final List< UUID > author = List.of(
+                    UUID.fromString( "340e672a-552a-4f6e-bffc-0a0790984161" ),
+                    UUID.fromString( "1b94c535-94c3-4b0f-bfee-53979e088d59" ),
+                    UUID.fromString( "7e400cd2-44a2-4c7d-bfdc-68a38262c61d" )
+            );
+
+            final List< UUID > product = List.of(
+                    UUID.fromString( "8c4c6598-9b86-4cec-b5d5-7e4a6e8476f4" ),
+                    UUID.fromString( "6230e2e6-a480-4cee-b9b7-3b217300e156" ),
+                    UUID.fromString( "abe24365-009f-41e0-bfa3-9c7a21c85792" )
+            );
+
+            final Random random = new Random();
+
+            final StringBuilder stringBuilder = new StringBuilder(
+                    PostgreCommands.INSERT.formatted(
+                            PostgreSqlTables.TABLETS.name().toLowerCase(),
+                            PostgreSqlTables.PRODUCT.name().toLowerCase(),
+                            """
+                            tags,
+                            owner,
+                            category,
+                            total_count,
+                            returned,
+                            dislikes,
+                            was_sold,
+                            watches,
+                            likes,
+                            limit_age,
+                            rating
+                            """
+                    )
+            );
+
+            for ( int i = 0; i < 1_000_000; i++ ) {
+                stringBuilder.append( "(" )
+                        .append( tags.get( random.nextInt( 0, tags.size() - 1 ) ) )
+                        .append( ", '" )
+                        .append( author.get( random.nextInt( 0, author.size() - 1 ) ) )
+                        .append( "', '" )
+                        .append( categories.get( random.nextInt( 0, categories.size() - 1 ) ) )
+                        .append( "', " )
+                        .append( random.nextInt( 1_000_000 ) )
+                        .append( ", " )
+                        .append( random.nextInt( 1_000_000 ) )
+                        .append( ", " )
+                        .append( random.nextInt( 1_000_000 ) )
+                        .append( ", " )
+                        .append( random.nextInt( 1_000_000 ) )
+                        .append( ", " )
+                        .append( random.nextInt( 1_000_000 ) )
+                        .append( ", " )
+                        .append( random.nextInt( 1_000_000 ) )
+                        .append( ", " )
+                        .append( random.nextInt( 18, 61 ) )
+                        .append( ", " )
+                        .append( random.nextFloat( 0, 6 ) )
+                        .append( ")" );
+            }
+
+            this.connection.createStatement().execute( stringBuilder.toString() );
+
+            System.out.println( "It is done" );
+
+        } catch ( final Exception exception ) {
+            super.logging( exception );
+        }
+    }
+
+    public void make_query () {
+        try (
+            final ClickHouseResponse response = this.clickHouseClient.connect( this.server )
+                    .format( ClickHouseFormat.RowBinaryWithNamesAndTypes )
+                    .query( "SELECT :category, COUNT(*) FROM :tablets.:product GROUP BY :category;" )
+                    .params(
+                            "category",
+                            PostgreSqlTables.TABLETS.name().toLowerCase(),
+                            PostgreSqlTables.PRODUCT.name().toLowerCase() )
+                    .executeAndWait()
+        ) {
+            response.records().forEach( record -> System.out.println(
+                    record.getValue( "category" ).asString()
+            ) );
+
+            final ClickHouseResponseSummary summary = response.getSummary();
+            System.out.println( summary.getTotalRowsToRead() );
+
+        } catch ( final ClickHouseException e ) {
             super.logging( e );
         }
     }

@@ -30,12 +30,19 @@
     </developers>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/ru.yandex.clickhouse/clickhouse-jdbc -->
         <dependency>
-            <groupId>ru.yandex.clickhouse</groupId>
-            <artifactId>clickhouse-jdbc</artifactId>
-            <version>0.3.2</version>
+            <groupId>com.clickhouse</groupId>
+            <!-- or clickhouse-grpc-client if you prefer gRPC -->
+            <artifactId>clickhouse-http-client</artifactId>
+            <version>0.3.2-patch11</version>
         </dependency>
+
+<!--        &lt;!&ndash; https://mvnrepository.com/artifact/ru.yandex.clickhouse/clickhouse-jdbc &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>ru.yandex.clickhouse</groupId>-->
+<!--            <artifactId>clickhouse-jdbc</artifactId>-->
+<!--            <version>0.3.2</version>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.liquibase</groupId>

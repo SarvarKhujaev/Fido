@@ -43,6 +43,8 @@ public final class PostgreCommands {
 
     public final static String SELECT = "SELECT * FROM";
 
+    public final static String INSERT = "INSERT INTO %s.%s ( %s ) VALUES ";
+
     /*
     Иногда бывает полезно получать данные из модифицируемых строк в процессе их обработки.
     Это возможно с использованием предложения RETURNING, которое можно задать для команд INSERT, UPDATE и DELETE.
