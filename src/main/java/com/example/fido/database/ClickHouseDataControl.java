@@ -15,7 +15,16 @@ public final class ClickHouseDataControl extends ErrorInspector {
     private final ClickHouseNode server;
     private final ClickHouseClient clickHouseClient;
 
-    public ClickHouseDataControl () {
+    private static ClickHouseDataControl INSTANCE = new ClickHouseDataControl();
+
+    public static ClickHouseDataControl getInstance() {
+        return INSTANCE != null ? INSTANCE : ( INSTANCE = new ClickHouseDataControl() );
+    }
+
+    private ClickHouseDataControl () {
+        /*
+        подключаемся в самой БД
+         */
         this.server = ClickHouseNode
                 .builder()
                 .host( "localhost" )
@@ -24,7 +33,14 @@ public final class ClickHouseDataControl extends ErrorInspector {
                 .credentials( ClickHouseCredentials.fromUserAndPassword( "default", "killerbee1998" ) )
                 .build();
 
+        /*
+        создаем клиента для дальнейших операций с БД
+         */
         this.clickHouseClient = ClickHouseClient.newInstance( this.server.getProtocol() );
+
+        /*
+        создаем все БД, таблицы и т.д
+         */
         DatabaseRegisterTablesAndTypes.register( this.server, this.clickHouseClient );
     }
 
@@ -95,7 +111,7 @@ public final class ClickHouseDataControl extends ErrorInspector {
                     )
             );
 
-            for ( int i = 0; i < 1_000; i++ ) {
+            for ( int i = 0; i < 1_000_000; i++ ) {
                 stringBuilder.append( "(" )
                         .append( tags.get( random.nextInt( 0, tags.size() - 1 ) ) )
                         .append( ", '" )
@@ -135,8 +151,6 @@ public final class ClickHouseDataControl extends ErrorInspector {
                 final ClickHouseResponseSummary summary = response.getSummary();
                 System.out.println( summary.getWrittenRows() );
             }
-
-//            this.connection.createStatement().execute( stringBuilder.toString() );
 
             System.out.println( "It is done" );
 
