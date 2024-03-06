@@ -37,6 +37,9 @@ public final class PostgreDataControl extends LogInspector {
                     password
             );
 
+            this.getConnection().setAutoCommit( false );
+            this.getConnection().setTransactionIsolation( Connection.TRANSACTION_READ_COMMITTED );
+
             // выводим сообщение об успехе
             super.logging( "Database is created" );
         } catch ( final SQLException e ) {
@@ -56,8 +59,9 @@ public final class PostgreDataControl extends LogInspector {
                 final ResultSet resultSet = preparedStatement.executeQuery();
 
                 final List< ? > banknoteList = new ArrayList<>();
-                while ( resultSet.next() ) {
-                }
+                while ( resultSet.next() ) {}
+
+                preparedStatement.close();
 
                 // проверяем что у нас есть записи в БД
                 return !banknoteList.isEmpty()

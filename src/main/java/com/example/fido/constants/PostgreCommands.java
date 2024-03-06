@@ -49,7 +49,9 @@ public final class PostgreCommands {
     https://postgrespro.ru/docs/postgresql/9.6/sql-set-transaction
 
     https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-transaction/
-     */
+
+    BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    */
     public final static String BEGIN_TRANSACTION = "BEGIN TRANSACTION;";
 
     public final static String COMMIT_TRANSACTION = "COMMIT TRANSACTION;";
