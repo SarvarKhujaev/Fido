@@ -111,7 +111,7 @@ public final class ClickHouseDataControl extends ErrorInspector {
                     )
             );
 
-            for ( int i = 0; i < 1_000_000; i++ ) {
+            for ( int i = 0; i < 3_000_000; i++ ) {
                 stringBuilder.append( "(" )
                         .append( tags.get( random.nextInt( 0, tags.size() - 1 ) ) )
                         .append( ", '" )
@@ -152,7 +152,10 @@ public final class ClickHouseDataControl extends ErrorInspector {
                 System.out.println( summary.getWrittenRows() );
             }
 
-            System.out.println( "It is done" );
+            tags.clear();
+            author.clear();
+            product.clear();
+            categories.clear();
 
         } catch ( final Exception exception ) {
             super.logging( exception );

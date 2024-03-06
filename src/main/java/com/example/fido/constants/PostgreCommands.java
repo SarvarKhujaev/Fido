@@ -46,6 +46,17 @@ public final class PostgreCommands {
     public final static String INSERT = "INSERT INTO %s.%s ( %s ) VALUES ";
 
     /*
+    https://postgrespro.ru/docs/postgresql/9.6/sql-set-transaction
+
+    https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-transaction/
+     */
+    public final static String BEGIN_TRANSACTION = "BEGIN TRANSACTION;";
+
+    public final static String COMMIT_TRANSACTION = "COMMIT TRANSACTION;";
+
+    public final static String SET_TRANSACTION = "SET TRANSACTION;";
+
+    /*
     Иногда бывает полезно получать данные из модифицируемых строк в процессе их обработки.
     Это возможно с использованием предложения RETURNING, которое можно задать для команд INSERT, UPDATE и DELETE.
     Применение RETURNING позволяет обойтись без дополнительного запроса к базе для сбора данных и это особенно ценно,
