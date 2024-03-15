@@ -10,10 +10,12 @@ import reactor.core.publisher.Mono;
 import java.util.function.Function;
 import java.util.function.BiFunction;
 
-import com.example.fido.components.LogInspector;
+import com.example.fido.FidoApplication;
 import com.example.fido.constants.PostgreCommands;
+import com.example.fido.interfaces.ServiceCommonMethods;
+import com.example.fido.components.CollectionsInspector;
 
-public final class PostgreDataControl extends LogInspector {
+public final class PostgreDataControl extends CollectionsInspector implements ServiceCommonMethods {
     private Connection connection;
     private static PostgreDataControl INSTANCE = new PostgreDataControl();
 
@@ -27,21 +29,27 @@ public final class PostgreDataControl extends LogInspector {
 
     private PostgreDataControl () {
         try {
-            final String user = "postgres";
-            final String password = "killerbee";
-
             // подключаемся к базе
             this.connection = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/postgres",
-                    user,
-                    password
+                    FidoApplication
+                            .context
+                            .getEnvironment()
+                            .getProperty( "variables.POSTGRES_VARIABLES.URL" ),
+                    FidoApplication
+                            .context
+                            .getEnvironment()
+                            .getProperty( "variables.POSTGRES_VARIABLES.USER" ),
+                    FidoApplication
+                            .context
+                            .getEnvironment()
+                            .getProperty( "variables.POSTGRES_VARIABLES.PASSWORD" )
             );
 
             this.getConnection().setAutoCommit( false );
             this.getConnection().setTransactionIsolation( Connection.TRANSACTION_READ_COMMITTED );
 
             // выводим сообщение об успехе
-            super.logging( "Database is created" );
+            super.logging( this.getClass() );
         } catch ( final SQLException e ) {
             super.logging( e );
             this.close();
@@ -108,10 +116,11 @@ public final class PostgreDataControl extends LogInspector {
     };
 
     // закрывает подключение к базе
-    private void close () {
+    @Override
+    public void close () {
         try {
             this.getConnection().close();
-            super.logging( "Database is closed" );
+            super.logging( this );
         } catch ( final Exception e ) {
             super.logging( e );
         }

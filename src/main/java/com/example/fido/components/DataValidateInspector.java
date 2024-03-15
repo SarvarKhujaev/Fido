@@ -1,16 +1,18 @@
 package com.example.fido.components;
 
-import java.util.function.Predicate;
 import reactor.core.publisher.Mono;
-import java.util.Objects;
 
 /*
 отвечает за валидацию различных параметров и объектов
 */
-public class DataValidateInspector {
+public class DataValidateInspector extends TimeInspector {
     protected <T> Mono< T > convert ( final T o ) {
         return Mono.just( o );
     }
 
-    protected final Predicate< Object > checkParam = Objects::nonNull;
+    protected boolean objectIsNotNull (
+            final Object o
+    ) {
+        return o != null;
+    }
 }

@@ -11,3 +11,21 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:changelog/dbchangelog.xml
+
+variables:
+  POSTGRES_VARIABLES:
+    URL: jdbc:postgresql://localhost:5432/postgres
+    USER: postgres
+    PASSWORD: killerbee
+
+  CLICKHOUSE_VARIABLES:
+    PORT: 8123
+    USER: default
+    HOST: localhost
+    DATABASE: default
+    PASSWORD: killerbee1998
+
+  REDIS_VARIABLES:
+    URL: redis://localhost:6379
+    USER: default
+    PASSWORD: killerbee1998

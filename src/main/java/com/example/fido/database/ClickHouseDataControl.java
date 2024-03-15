@@ -3,15 +3,17 @@ package com.example.fido.database;
 import java.util.*;
 import com.clickhouse.client.*;
 
+import com.example.fido.FidoApplication;
 import com.example.fido.components.ErrorInspector;
 import com.example.fido.constants.PostgreCommands;
 import com.example.fido.constants.PostgreSqlTables;
 import com.example.fido.constants.clickhouse.Categories;
+import com.example.fido.interfaces.ServiceCommonMethods;
 
 /*
 отвечает за работу с БД ClickHouse
 */
-public final class ClickHouseDataControl extends ErrorInspector {
+public final class ClickHouseDataControl extends ErrorInspector implements ServiceCommonMethods {
     private final ClickHouseNode server;
     private final ClickHouseClient clickHouseClient;
 
@@ -27,11 +29,36 @@ public final class ClickHouseDataControl extends ErrorInspector {
          */
         this.server = ClickHouseNode
                 .builder()
-                .host( "localhost" )
-                .port( ClickHouseProtocol.HTTP, 8123 )
-                .database( "default" )
-                .credentials( ClickHouseCredentials.fromUserAndPassword( "default", "killerbee1998" ) )
-                .build();
+                .host( FidoApplication
+                        .context
+                        .getEnvironment()
+                        .getProperty( "variables.CLICKHOUSE_VARIABLES.HOST" ) )
+                .port(
+                        ClickHouseProtocol.HTTP,
+                        Integer.valueOf(
+                                FidoApplication
+                                        .context
+                                        .getEnvironment()
+                                        .getProperty( "variables.CLICKHOUSE_VARIABLES.PORT" )
+                        )
+                ).database(
+                        FidoApplication
+                                .context
+                                .getEnvironment()
+                                .getProperty( "variables.CLICKHOUSE_VARIABLES.DATABASE" )
+                )
+                .credentials(
+                        ClickHouseCredentials.fromUserAndPassword(
+                                FidoApplication
+                                        .context
+                                        .getEnvironment()
+                                        .getProperty( "variables.CLICKHOUSE_VARIABLES.USER" ),
+                                FidoApplication
+                                        .context
+                                        .getEnvironment()
+                                        .getProperty( "variables.CLICKHOUSE_VARIABLES.PASSWORD" )
+                        )
+                ).build();
 
         /*
         создаем клиента для дальнейших операций с БД
@@ -42,6 +69,8 @@ public final class ClickHouseDataControl extends ErrorInspector {
         создаем все БД, таблицы и т.д
          */
         DatabaseRegisterTablesAndTypes.register( this.server, this.clickHouseClient );
+
+        super.logging( this.getClass() );
     }
 
     public void insertValues () {
@@ -183,5 +212,13 @@ public final class ClickHouseDataControl extends ErrorInspector {
         } catch ( final ClickHouseException e ) {
             super.logging( e );
         }
+    }
+
+    @Override
+    public void close () {
+        INSTANCE = null;
+        this.clickHouseClient.close();
+
+        super.logging( this.getClass() );
     }
 }
