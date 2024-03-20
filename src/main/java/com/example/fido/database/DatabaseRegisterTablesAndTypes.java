@@ -45,7 +45,6 @@ public final class DatabaseRegisterTablesAndTypes extends ErrorInspector {
                             )
                     ).executeAndWait();
 
-            System.out.println( response.getSummary().getProgress().getWrittenBytes() );
             response.close();
         } catch ( final ClickHouseException exception ) {
             super.logging( exception );

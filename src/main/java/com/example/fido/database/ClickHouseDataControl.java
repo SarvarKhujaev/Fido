@@ -29,11 +29,12 @@ public final class ClickHouseDataControl extends ErrorInspector implements Servi
          */
         this.server = ClickHouseNode
                 .builder()
-                .host( FidoApplication
-                        .context
-                        .getEnvironment()
-                        .getProperty( "variables.CLICKHOUSE_VARIABLES.HOST" ) )
-                .port(
+                .host(
+                        FidoApplication
+                                .context
+                                .getEnvironment()
+                                .getProperty( "variables.CLICKHOUSE_VARIABLES.HOST" )
+                ).port(
                         ClickHouseProtocol.HTTP,
                         Integer.valueOf(
                                 FidoApplication
@@ -46,8 +47,7 @@ public final class ClickHouseDataControl extends ErrorInspector implements Servi
                                 .context
                                 .getEnvironment()
                                 .getProperty( "variables.CLICKHOUSE_VARIABLES.DATABASE" )
-                )
-                .credentials(
+                ).credentials(
                         ClickHouseCredentials.fromUserAndPassword(
                                 FidoApplication
                                         .context
@@ -177,8 +177,7 @@ public final class ClickHouseDataControl extends ErrorInspector implements Servi
                         .query( stringBuilder.toString() )
                         .executeAndWait()
             ) {
-                final ClickHouseResponseSummary summary = response.getSummary();
-                System.out.println( summary.getWrittenRows() );
+                super.logging( response.getSummary() );
             }
 
             tags.clear();
@@ -202,12 +201,11 @@ public final class ClickHouseDataControl extends ErrorInspector implements Servi
                             PostgreSqlTables.PRODUCT.name().toLowerCase() )
                     .executeAndWait()
         ) {
-            response.records().forEach( record -> System.out.println(
-                    record.getValue( "category" ).asString()
-            ) );
+            response.records().forEach(
+                    record -> super.logging( record.getValue( "category" ).asString() )
+            );
 
-            final ClickHouseResponseSummary summary = response.getSummary();
-            System.out.println( summary.getTotalRowsToRead() );
+            super.logging( response.getSummary() );
 
         } catch ( final ClickHouseException e ) {
             super.logging( e );

@@ -20,6 +20,8 @@ public final class PostgreTransactionIsolationTypes {
     */
     public static final String READ_UNCOMMITTED = "READ UNCOMMITTED";
 
+    public static final String READ_COMMITTED = "READ COMMITTED";
+
     /*
     Неповторяющееся чтение (Non-repeatable read) - после того, как
     транзакция T1 прочитала строку, транзакция T2 изменила или удалила эту

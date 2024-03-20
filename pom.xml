@@ -75,13 +75,6 @@
             <version>0.3.2-patch11</version>
         </dependency>
 
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/ru.yandex.clickhouse/clickhouse-jdbc &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>ru.yandex.clickhouse</groupId>-->
-<!--            <artifactId>clickhouse-jdbc</artifactId>-->
-<!--            <version>0.3.2</version>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>

@@ -1,7 +1,8 @@
 package com.example.fido.components;
 
-import org.apache.logging.log4j.Logger;
+import com.clickhouse.client.ClickHouseResponseSummary;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /*
 отвечает за вывод различных логов
@@ -26,11 +27,11 @@ public class LogInspector extends DataValidateInspector {
         this.getLOGGER().info( message );
     }
 
-    protected final void logging ( final Throwable error ) {
-        this.getLOGGER().error( "Error: " + error );
+    protected final void logging ( final ClickHouseResponseSummary responseSummary ) {
+        this.getLOGGER().info( responseSummary.getTotalRowsToRead() );
     }
 
-    protected void logging ( final Throwable error, final Object o ) {
-        this.getLOGGER().error("Error: {} and reason: {}: ", error.getMessage(), o );
+    protected final void logging ( final Throwable error ) {
+        this.getLOGGER().error( "Error: " + error );
     }
 }
