@@ -16,7 +16,7 @@ VACUUM, особенно для часто изменяемых таблиц.
 
 VACUUM (VERBOSE, ANALYZE) test;
 */
-public enum PostgreVacuumMethods {
+public enum PostgresVacuumMethods {
     /*
     выводит на экран отчёт об очистке для каждой таблицы.
      */

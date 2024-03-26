@@ -1,22 +1,6 @@
 package com.example.fido.constants;
 
 public final class PostgreCommands {
-    public final static String SELECT_ROWS_FOR_BANKNOTE_NAME = "SELECT * FROM "
-            + PostgreSqlTables.BANKNOTE
-            + " WHERE name = ?;";
-
-    public final static String SELECT_COUNT = "SELECT count(*) FROM "
-            + PostgreSqlTables.BANKNOTE
-            + ";";
-
-    public final static String SELECT_ALL_BANKNOTE_WITH_PAGINATION =
-            "SELECT * FROM "
-                    + PostgreSqlTables.BANKNOTE
-                    + " ORDER BY updated_date ASC" // сортируем по дате сохранения
-                    + " LIMIT ?"
-                    + " OFFSET ?"
-                    + ";";
-
     /*
     The HAVING clause was added to SQL because the WHERE clause cannot be used with aggregate functions.
     Aggregate functions are often used with GROUP BY clauses,

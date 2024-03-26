@@ -1,17 +1,14 @@
 package com.example.fido.database;
 
 import java.sql.*;
+import java.util.Arrays;
+import java.text.MessageFormat;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
-
-import reactor.core.publisher.Mono;
-import java.util.function.Function;
-import java.util.function.BiFunction;
+import com.example.fido.constants.PostgreSqlTables;
+import com.example.fido.constants.PostgresBufferMethods;
+import com.example.fido.constants.PostgresVacuumMethods;
 
 import com.example.fido.FidoApplication;
-import com.example.fido.constants.PostgreCommands;
 import com.example.fido.interfaces.ServiceCommonMethods;
 import com.example.fido.components.CollectionsInspector;
 
@@ -45,8 +42,14 @@ public final class PostgreDataControl extends CollectionsInspector implements Se
                             .getProperty( "variables.POSTGRES_VARIABLES.PASSWORD" )
             );
 
-            this.getConnection().setAutoCommit( false );
             this.getConnection().setTransactionIsolation( Connection.TRANSACTION_READ_COMMITTED );
+
+            this.prewarmTable();
+
+            super.analyze(
+                    super.newList( PostgreSqlTables.values() ),
+                    this::insertTableContentToBuffer
+            );
 
             // выводим сообщение об успехе
             super.logging( this.getClass() );
@@ -56,69 +59,66 @@ public final class PostgreDataControl extends CollectionsInspector implements Se
         }
     }
 
-    // получает название банкноты и возвращает его историю
-    public final Function< String, Mono< List< ? > > > getCurrentBanknote = banknoteName -> {
-            try {
-                final PreparedStatement preparedStatement = this.getConnection()
-                        .prepareStatement( PostgreCommands.SELECT_ROWS_FOR_BANKNOTE_NAME );
+    @Override
+    public void prewarmTable () {
+        try (
+                final PreparedStatement preparedStatement = this.getConnection().prepareStatement(
+                        PostgresBufferMethods.PREWARM_TABLE
+                )
+        ) {
+            preparedStatement.executeQuery();
+        } catch ( final SQLException e ) {
+            super.logging( e );
+        }
+    }
 
-                preparedStatement.setString( 1, banknoteName );
+    @Override
+    public void vacuumTable (
+            final PostgreSqlTables table
+    ) {
+        try (
+                final PreparedStatement preparedStatement = this.getConnection().prepareStatement(
+                        MessageFormat.format(
+                                """
+                                "VACUUM( {0} ) {1};"
+                                """,
+                                PostgresVacuumMethods.ANALYZE,
+                                table
+                        )
+                )
+        ) {
+            preparedStatement.executeQuery();
+        } catch ( final SQLException e ) {
+            super.logging( e );
+        }
+    }
 
-                final ResultSet resultSet = preparedStatement.executeQuery();
-
-                final List< ? > banknoteList = new ArrayList<>();
-                while ( resultSet.next() ) {}
-
-                preparedStatement.close();
-
-                // проверяем что у нас есть записи в БД
-                return !banknoteList.isEmpty()
-                        ? Mono.just( banknoteList )
-                        : Mono.just( Collections.emptyList() );
-            } catch ( final SQLException e ) {
-                this.close();
-                super.logging( e );
-                return Mono.error( e );
-            }
-    };
-
-    // возвращет все записи по всем купюрам с применением пагинации
-    public final BiFunction< Integer, Integer, Mono< ? > > getAllBanknotes = ( page, size ) -> {
-            try {
-                final ResultSet resultSetForCount = this.getConnection()
-                        .prepareStatement( PostgreCommands.SELECT_COUNT )
-                        .executeQuery();
-
-                final long count = resultSetForCount.next()
-                        ? resultSetForCount.getLong( "count" )
-                        : 0L;
-
-                resultSetForCount.close();
-
-                // проверяем что у нас есть записи в БД
-                if ( count > 0 ) {
-                    final PreparedStatement preparedStatement = this.getConnection()
-                            .prepareStatement( PostgreCommands.SELECT_ALL_BANKNOTE_WITH_PAGINATION );
-
-                    preparedStatement.setLong( 1, size );
-                    preparedStatement.setLong( 2, (long) size * page );
-
-                    final ResultSet resultSet = preparedStatement.executeQuery();
-
-                    resultSet.close();
-                    return Mono.empty();
-                } return Mono.empty();
-            } catch ( final Exception e ) {
-                this.close();
-                super.logging( e );
-                return Mono.error( e );
-            }
-    };
+    @Override
+    public void insertTableContentToBuffer(
+            final PostgreSqlTables table
+    ) {
+        try (
+                final PreparedStatement preparedStatement = this.getConnection().prepareStatement(
+                        PostgresBufferMethods.INSERT_TABLE_CONTENT_INTO_BUFFER.formatted(
+                                table
+                        )
+                )
+        ) {
+            preparedStatement.executeQuery();
+        } catch ( final SQLException e ) {
+            super.logging( e );
+        }
+    }
 
     // закрывает подключение к базе
     @Override
     public void close () {
         try {
+            super.analyze(
+                    Arrays.asList( PostgreSqlTables.values() ),
+                    this::vacuumTable
+            );
+
             this.getConnection().close();
             super.logging( this );
         } catch ( final Exception e ) {
