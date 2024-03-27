@@ -18,7 +18,11 @@ public interface ServiceCommonMethods {
             final PostgreSqlTables table
     ) {}
 
-    default void prewarmTable () {};
+    default void calculateBufferForTable (
+            final PostgreSqlTables table
+    ) {}
+
+    default void prewarmTable () {}
 
     void close();
 }

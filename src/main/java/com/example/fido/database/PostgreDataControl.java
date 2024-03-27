@@ -104,7 +104,42 @@ public final class PostgreDataControl extends CollectionsInspector implements Se
                         )
                 )
         ) {
-            preparedStatement.executeQuery();
+            super.logging(
+                    String.valueOf( preparedStatement.executeQuery().getInt( "pg_prewarm" ) )
+            );
+        } catch ( final SQLException e ) {
+            super.logging( e );
+        }
+    }
+
+    /*
+    выводим данные о потреблении кеша буферизации
+    для конкретной таблицы
+     */
+    @Override
+    public void calculateBufferForTable(
+            final PostgreSqlTables table
+    ) {
+        try (
+                final PreparedStatement preparedStatement = this.getConnection().prepareStatement(
+                        PostgresBufferMethods.SELECT_BUFFER_ANALYZE_FOR_TABLE.formatted(
+                                table
+                        )
+                )
+        ) {
+            final ResultSet resultSet = preparedStatement.executeQuery();
+
+            super.logging(
+                    String.join(
+                            " : ",
+                            String.valueOf( resultSet.getLong( "bufferid" ) ),
+                            resultSet.getString( "relname" ),
+                            resultSet.getString( "relfork" ),
+                            String.valueOf( resultSet.getInt( "relblocknumber" ) ),
+                            String.valueOf( resultSet.getBoolean( "isdirty" ) ),
+                            String.valueOf( resultSet.getInt( "usagecount" ) )
+                    )
+            );
         } catch ( final SQLException e ) {
             super.logging( e );
         }
@@ -116,7 +151,10 @@ public final class PostgreDataControl extends CollectionsInspector implements Se
         try {
             super.analyze(
                     Arrays.asList( PostgreSqlTables.values() ),
-                    this::vacuumTable
+                    table -> {
+                        this.calculateBufferForTable( table );
+                        this.vacuumTable( table );
+                    }
             );
 
             this.getConnection().close();

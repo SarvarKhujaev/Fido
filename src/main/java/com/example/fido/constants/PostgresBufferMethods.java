@@ -19,4 +19,14 @@ public final class PostgresBufferMethods {
             "SELECT {0}( '%s' );",
             PG_PREWARM
     );
+
+    /*
+    создает расширение для работы и аналитики буфера кэширования
+    */
+    public static final String CREATE_EXTENSION_FOR_BUFFER_READ = "CREATE EXTENSION pg_buffercache;";
+
+    /*
+    возвращает данные о потреблении буфера для конкретной таблицы
+    */
+    public static final String SELECT_BUFFER_ANALYZE_FOR_TABLE = "SELECT * FROM pg_buffercache_v WHERE relname= '%s';";
 }

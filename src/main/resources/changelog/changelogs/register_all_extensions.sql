@@ -13,17 +13,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 который раз в pg_prewarm.autoprewarm_interval будет сбрасывать на диск список страниц,
 находящихся в кеше (не забудьте учесть новый процесс при установке max_parallel_processes).
 */
+CREATE EXTENSION pg_buffercache;
+
 CREATE EXTENSION IF NOT EXISTS pg_prewarm;
 ALTER SYSTEM SET shared_preload_libraries = 'pg_prewarm';
-
-/*
-Если мы предполагаем, что все содержимое таблицы очень важно,
-мы можем прочитать ее в буферный кеш с помощью вызова следующей функции:
-*/
-SELECT pg_prewarm( '%s' );
-
-/*
-Список страниц сбрасывается в файл autoprewarm.blocks. Чтобы его увидеть, можно просто подождать,
-пока процесс autoprewarm master отработает в первый раз, но мы инициируем это вручную:
-*/
-SELECT autoprewarm_dump_now();
