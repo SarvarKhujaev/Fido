@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS entities.common_params (
-    id UUID DEFAULT uuid_generate_v4()
+    id SERIAL
 );
 
 CREATE TABLE IF NOT EXISTS entities.location_params (
@@ -13,6 +13,121 @@ CREATE TABLE IF NOT EXISTS entities.location_params (
 CREATE TABLE IF NOT EXISTS entities.common_params_with_timestamp (
     created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP -- время регистрации
 );
+
+CREATE TABLE IF NOT EXISTS entities.students (
+    age SMALLINT NOT NULL DEFAULT 18,
+
+    name VARCHAR( 50 ) NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    surname VARCHAR( 50 ) NOT NULL,
+    birth_date TEXT NOT NULL,
+    father_name VARCHAR( 50 ) NOT NULL,
+    phone_number TEXT NOT NULL UNIQUE,
+    student_short_description VARCHAR( 200 ) NOT NULL,
+
+    CHECK (
+        character_length( phone_number ) = 13 AND substr( phone_number, 0, 6 ) = '+9989'
+    )
+) INHERITS ( entities.common_params, entities.common_params_with_timestamp );
+
+CREATE TABLE IF NOT EXISTS entities.teachers (
+    age SMALLINT NOT NULL DEFAULT 18,
+
+    name VARCHAR( 50 ) NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    surname VARCHAR( 50 ) NOT NULL,
+    birth_date TEXT NOT NULL,
+    father_name VARCHAR( 50 ) NOT NULL,
+    phone_number TEXT NOT NULL UNIQUE,
+    teacher_short_description VARCHAR( 200 ) NOT NULL,
+
+    CHECK (
+        character_length( phone_number ) = 13 AND substr( phone_number, 0, 6 ) = '+9989'
+    )
+) INHERITS ( entities.common_params, entities.common_params_with_timestamp );
+
+CREATE TABLE IF NOT EXISTS entities.education_directions (
+    direction_name VARCHAR( 50 ) NOT NULL UNIQUE
+) INHERITS ( entities.common_params );
+
+CREATE TABLE IF NOT EXISTS entities.groups (
+    group_name VARCHAR( 50 ) NOT NULL UNIQUE,
+
+    students_number SMALLINT NOT NULL DEFAULT 0,
+    max_students_number SMALLINT NOT NULL DEFAULT 3,
+
+    teacher_id BIGINT NOT NULL REFERENCES entities.teachers( id ),
+    education_direction_id BIGINT NOT NULL REFERENCES entities.education_directions( id ),
+
+    CHECK (
+        max_students_number >= 3 AND students_number >= 0 AND students_number < max_students_number
+    )
+
+) INHERITS ( entities.common_params, entities.common_params_with_timestamp );
+
+CREATE TABLE IF NOT EXISTS entities.lessons (
+    lesson_name VARCHAR( 50 ) NOT NULL,
+    lesson_status entities_enums.lesson_status NOT NULL DEFAULT 'CREATED',
+
+    group_id BIGINT NOT NULL REFERENCES entities.groups( id )
+
+) INHERITS ( entities.common_params, entities.common_params_with_timestamp );
+
+CREATE TABLE IF NOT EXISTS entities.comments (
+    comment VARCHAR( 200 ) NOT NULL,
+    mark SMALLINT NOT NULL DEFAULT 5,
+
+    lesson_id BIGINT NOT NULL REFERENCES entities.lessons( id ),
+    student_id BIGINT NOT NULL REFERENCES entities.students( id ),
+
+    CHECK ( mark >= 1 AND mark <= 5 )
+
+) INHERITS ( entities.common_params, entities.common_params_with_timestamp );
+
+CREATE TABLE IF NOT EXISTS entities.homework (
+    homework_description VARCHAR( 500 ) NOT NULL,
+
+    lesson_id BIGINT NOT NULL REFERENCES entities.lessons( id ),
+
+    CHECK ( character_length( homework_description ) BETWEEN 50 AND 500 )
+
+) INHERITS ( entities.common_params, entities.common_params_with_timestamp );
+
+CREATE TABLE IF NOT EXISTS entities.student_appearance_in_lessons (
+    lesson_appearance_types entities_enums.lesson_appearance_types NOT NULL DEFAULT 'ABSENT',
+
+    lesson_id BIGINT NOT NULL REFERENCES entities.lessons( id ),
+    student_id BIGINT NOT NULL REFERENCES entities.students( id )
+
+) INHERITS ( entities.common_params, entities.common_params_with_timestamp );
+
+CREATE TABLE IF NOT EXISTS entities.student_marks (
+    mark_for_homework SMALLINT NOT NULL DEFAULT 5,
+
+    teacher_comment VARCHAR( 200 ) NOT NULL,
+
+    teacher_id BIGINT NOT NULL REFERENCES entities.teachers( id ),
+    student_id BIGINT NOT NULL REFERENCES entities.students( id ),
+
+    CHECK (
+        ( mark_for_homework BETWEEN 1 AND 5 )
+            AND ( character_length( teacher_comment ) BETWEEN 20 AND 200 )
+    )
+
+) INHERITS ( entities.common_params, entities.common_params_with_timestamp );
+
+CREATE TABLE IF NOT EXISTS entities.STUDENTS_WITH_EDUCATION_DIRECTION_JOIN_TABLE (
+    student_id BIGINT NOT NULL REFERENCES entities.students( id ),
+    education_direction_id BIGINT NOT NULL REFERENCES entities.education_directions( id )
+);
+
+CREATE TABLE IF NOT EXISTS entities.Students_With_Groups_Join_Table (
+    group_id BIGINT NOT NULL REFERENCES entities.groups( id ),
+    student_id BIGINT NOT NULL REFERENCES entities.students( id )
+);
+
+
+
 
 
 CREATE TABLE IF NOT EXISTS entities.patruls (

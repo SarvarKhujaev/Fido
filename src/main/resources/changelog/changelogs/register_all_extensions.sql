@@ -1,19 +1,4 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
-/*
-После перезапуска сервера должно пройти некоторое время, чтобы кеш «прогрелся» — набрал актуальные активно использующиеся данные.
-Иногда может оказаться полезным сразу прочитать в кеш данные определенных таблиц, и для этого предназначено специальное расширение:
-
-Раньше расширение могло только читать определенные таблицы в буферный кеш (или только в кеш ОС).
-Но в версии PostgreSQL 11 оно получило возможность сохранять актуальное состояние кеша на диск
-и восстанавливать его же после перезагрузки сервера. Чтобы этим воспользоваться,
-надо добавить библиотеку в shared_preload_libraries и перезагрузить сервер.
-
-Поле рестарта, если не менялось значение параметра pg_prewarm.autoprewarm, будет автоматически запущен фоновый процесс autoprewarm master,
-который раз в pg_prewarm.autoprewarm_interval будет сбрасывать на диск список страниц,
-находящихся в кеше (не забудьте учесть новый процесс при установке max_parallel_processes).
-*/
 CREATE EXTENSION pg_buffercache;
-
 CREATE EXTENSION IF NOT EXISTS pg_prewarm;
-ALTER SYSTEM SET shared_preload_libraries = 'pg_prewarm';
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS pgstattuple;

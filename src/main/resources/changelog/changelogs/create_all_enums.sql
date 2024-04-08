@@ -33,4 +33,16 @@ CREATE TYPE entities_enums.task_types AS ENUM (
     'FIND_FACE_EVENT_BODY',
     'FIND_FACE_EVENT_CAR',
     'FIND_FACE_EVENT_FACE'
-)
+);
+
+CREATE TYPE entities_enums.lesson_appearance_types AS ENUM (
+    'IN_TIME',
+    'ABSENT',
+    'LATE'
+);
+
+CREATE TYPE entities_enums.lesson_status AS ENUM (
+    'CANCELED',
+    'FINISHED',
+    'CREATED'
+);
