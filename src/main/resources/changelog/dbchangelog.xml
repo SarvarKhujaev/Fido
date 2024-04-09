@@ -11,6 +11,9 @@
     <include file="/changelog/changelogs/create_all_types.sql"/>
     <include file="/changelog/changelogs/create_all_tables.sql"/>
     <include file="/changelog/changelogs/register_all_indexes.sql"/>
-<!--    <include file="/changelog/changelogs/create_all_functions.sql"/>-->
+    <include file="/changelog/changelogs/create_all_functions.sql"/>
+    <include file="/changelog/changelogs/create_all_materialized_views.sql"/>
+    <include file="/changelog/changelogs/create_all_partitions.sql"/>
+    <include file="/changelog/changelogs/create_all_stats.sql"/>
 <!--    <include file="/changelog/changelogs/create_all_triggers.sql"/>-->
 </databaseChangeLog>
