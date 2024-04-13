@@ -72,7 +72,6 @@ CREATE TABLE IF NOT EXISTS entities.lessons (
     group_id BIGINT NOT NULL REFERENCES entities.groups( id )
 
 ) INHERITS ( entities.common_params, entities.common_params_with_timestamp )
-PARTITION BY LIST ( lesson_status )
 PARTITION BY RANGE ( created_date );
 
 CREATE TABLE IF NOT EXISTS entities.comments (
@@ -103,8 +102,7 @@ CREATE TABLE IF NOT EXISTS entities.student_appearance_in_lessons (
     lesson_id BIGINT NOT NULL REFERENCES entities.lessons( id ),
     student_id BIGINT NOT NULL REFERENCES entities.students( id )
 
-) INHERITS ( entities.common_params, entities.common_params_with_timestamp )
-PARTITION BY LIST ( lesson_appearance_types );
+) INHERITS ( entities.common_params, entities.common_params_with_timestamp );
 
 CREATE TABLE IF NOT EXISTS entities.student_marks (
     mark_for_homework SMALLINT NOT NULL DEFAULT 5,
