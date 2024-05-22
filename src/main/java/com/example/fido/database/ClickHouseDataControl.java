@@ -19,14 +19,14 @@ public final class ClickHouseDataControl extends ErrorInspector implements Servi
 
     private static ClickHouseDataControl INSTANCE = new ClickHouseDataControl();
 
-    public static ClickHouseDataControl getInstance() {
+    public static ClickHouseDataControl getInstance () {
         return INSTANCE != null ? INSTANCE : ( INSTANCE = new ClickHouseDataControl() );
     }
 
     private ClickHouseDataControl () {
         /*
         подключаемся в самой БД
-         */
+        */
         this.server = ClickHouseNode
                 .builder()
                 .host(
@@ -62,12 +62,12 @@ public final class ClickHouseDataControl extends ErrorInspector implements Servi
 
         /*
         создаем клиента для дальнейших операций с БД
-         */
+        */
         this.clickHouseClient = ClickHouseClient.newInstance( this.server.getProtocol() );
 
         /*
         создаем все БД, таблицы и т.д
-         */
+        */
         DatabaseRegisterTablesAndTypes.register( this.server, this.clickHouseClient );
 
         super.logging( this.getClass() );
@@ -198,8 +198,8 @@ public final class ClickHouseDataControl extends ErrorInspector implements Servi
                     .params(
                             "category",
                             PostgreSqlTables.TABLETS.name().toLowerCase(),
-                            PostgreSqlTables.PRODUCT.name().toLowerCase() )
-                    .executeAndWait()
+                            PostgreSqlTables.PRODUCT.name().toLowerCase()
+                    ).executeAndWait()
         ) {
             response.records().forEach(
                     record -> super.logging( record.getValue( "category" ).asString() )

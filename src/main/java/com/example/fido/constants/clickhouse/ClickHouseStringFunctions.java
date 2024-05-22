@@ -12,7 +12,7 @@ public final class ClickHouseStringFunctions {
 
     /*
     Возвращает 1 если needle является подпоследовательностью haystack, иначе 0.
-     */
+    */
     public static final String HAS_SUBSEQUENCE = "hasSubsequence";
 
     /*
