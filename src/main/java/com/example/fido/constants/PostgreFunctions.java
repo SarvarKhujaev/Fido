@@ -2,6 +2,23 @@ package com.example.fido.constants;
 
 public final class PostgreFunctions {
     /*
+    https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-any/
+
+    SELECT *
+    FROM employees
+    WHERE salary < ANY (
+        SELECT salary
+        FROM employees
+    );
+     */
+    public final static String ANY = "ANY( %s )";
+
+    /*
+    https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-cast/
+     */
+    public final static String CAST = "CAST( %s, AS %s )";
+
+    /*
     Текущие размеры значения массива можно получить с помощью функции array_dims
     array_dims выдаёт результат типа text, что удобно скорее для людей, чем для программ.
     Размеры массива также можно получить с помощью функций array_upper и array_lower,
@@ -57,11 +74,6 @@ public final class PostgreFunctions {
     возвращает общее число элементов массива по всем измерениям. Фактически это число строк, которое вернёт функция unnest
     */
     public final static String CARDINALITY = "cardinality ( %s )";
-
-    /*
-    SELECT * FROM sal_emp WHERE 10000 = ANY (pay_by_quarter);
-     */
-    public final static String ANY = "ANY( %s )";
 
     /*
     А так можно найти в таблице строки, в которых массивы содержат только значения, равные 10000:

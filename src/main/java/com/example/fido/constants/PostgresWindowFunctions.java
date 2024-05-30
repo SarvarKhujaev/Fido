@@ -13,6 +13,31 @@ window_function(arg1, arg2,..) OVER (
 public final class PostgresWindowFunctions {
     public final static String OVER = "OVER( %s )";
 
+    public final static String UNION = "UNION( %s )";
+
+    public final static String EXCEPT = "EXCEPT( %s )";
+
+    public final static String INTERSECT = "INTERSECT( %s )";
+
+    public final static String FETCH = "FETCH( %s )";
+
+    /*
+    https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-rollup/
+
+    SELECT
+        brand,
+        segment,
+        SUM (quantity)
+    FROM
+        sales
+    GROUP BY
+        ROLLUP (brand, segment)
+    ORDER BY
+        brand,
+        segment;
+     */
+    public final static String ROLLUP = "ROLLUP( %s )";
+
     /*
     SELECT
        wf1() OVER w,
@@ -169,7 +194,8 @@ public final class PostgresWindowFunctions {
     /*
     Return a value evaluated at the row that is at a specified physical offset row before the current row within the partition.
 
-    The following statement uses the LAG() function to return the prices from the previous row and calculates the difference between the price of the current row and the previous row.
+    The following statement uses the LAG() function to return the prices from the previous row and calculates
+    the difference between the price of the current row and the previous row.
 
     SELECT
         product_name,
@@ -185,8 +211,7 @@ public final class PostgresWindowFunctions {
             ORDER BY
                 price
         ) AS cur_prev_diff
-    FROM
-        products
+    FROM products
     INNER JOIN product_groups USING (group_id);
     */
     public final static String LAG = "LAG %s";
